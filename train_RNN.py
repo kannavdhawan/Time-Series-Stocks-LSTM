@@ -96,5 +96,71 @@ from matplotlib import pyplot as plt
 Loading dataset 
 """
 train=pd.read_csv("train_data_RNN.csv",index_col=[0])
-# train=train.iloc[:,1:]
+
 print(train.head())
+
+#separating data and labels
+X_train,y_train=train.iloc[:,:-1],train['Target']
+print(X_train.head())
+print(y_train.head()) 
+
+
+#scaling 
+X_train_scaler=MinMaxScaler(feature_range=(0,1))
+y_train_scaler=MinMaxScaler(feature_range=(0,1))
+
+X_train=X_train_scaler.fit_transform(X_train)
+y_train=y_train_scaler.fit_transform(np.asarray(y_train).reshape(-1,1)) # To make ot 2D, reshaping ..
+
+#Reshaping the dataset X_train to 3 dimensional numpy array for lstm
+
+X_train=np.asarray(X_train).reshape(879,3,4)
+print("X_train shape: ",X_train.shape)
+print("y train shape:",y_train.shape)
+# Defining model 
+# model = Sequential()
+# model.add(LSTM(64, input_shape=(3,4)))
+# model.add(LSTM(units=32, return_sequences = True))
+# model.add(Dense(1))
+# model.compile(loss='mean_squared_error', optimizer='sgd')
+
+model =Sequential()
+model.add(LSTM(units=32, return_sequences= True, input_shape=(3,4))),
+
+model.add(LSTM(units=10, return_sequences= False)),
+model.add(Dense(units=30))
+model.add(Dense(units=20))
+model.add(Dense(units=10))
+model.add(Dense(units=1))
+model.compile(loss='mean_squared_error', optimizer='adam')
+
+
+# printing model summary 
+print(model.summary())
+#Training
+print("Training..")
+history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2)
+
+loss=model.evaluate(X_train,y_train)
+print("Loss on Train set: ",loss)
+
+# Just to get the RMSE for train data ..
+
+y_pred_train = model.predict(X_train)
+
+print("y_pred_train:",y_pred_train.shape) #np array (879,1)
+print("y_train:", y_train.shape)          #np array (879,1)
+
+#Inverting both y_train and y_pred_train 
+y_pred_train = y_train_scaler.inverse_transform(y_pred_train)
+y_train = y_train_scaler.inverse_transform(y_train) 
+print("y_pred_train:",y_pred_train.shape) #np array (879,1)
+print("y_train:", y_train.shape)          #np array (879,1)
+
+print(y_pred_train[0])
+print(y_train[0])
+
+# calculate root mean squared error
+RMSE= math.sqrt(mean_squared_error(y_train, y_pred_train))
+print("RMSE for training data:",RMSE)
+model.save("lstm_model.h5")
