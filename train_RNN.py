@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import random
 import math
+import pickle
 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
@@ -108,13 +109,16 @@ print(y_train.head())
 
 
 #scaling 
-X_train_scaler=MinMaxScaler(feature_range=(0,1))
-y_train_scaler=MinMaxScaler(feature_range=(0,1))
-
-X_train=X_train_scaler.fit_transform(X_train)
-y_train=y_train_scaler.fit_transform(np.asarray(y_train).reshape(-1,1)) # To make ot 2D, reshaping ..
+scalar=[]
+X_train_scalar=MinMaxScaler(feature_range=(0,1))
+y_train_scalar=MinMaxScaler(feature_range=(0,1))
 
 
+X_train=X_train_scalar.fit_transform(X_train)
+y_train=y_train_scalar.fit_transform(np.asarray(y_train).reshape(-1,1)) # To make ot 2D, reshaping ..
+
+scalar.extend([X_train_scalar,y_train_scalar])
+pickle.dump(scalar,open("scalar.pkl", "wb" ))
 #Reshaping the dataset X_train to 3 dimensional numpy array for lstm
 
 X_train=np.asarray(X_train).reshape(879,3,4)
@@ -135,7 +139,7 @@ model.add(Dense(units=30))
 model.add(Dense(units=20))
 model.add(Dense(units=10))
 model.add(Dense(units=1))
-model.compile(loss='mean_squared_error', optimizer='sgd')
+model.compile(loss='mean_squared_error', optimizer='adam')
 
 
 # printing model summary 
@@ -157,8 +161,8 @@ print("y_pred_train:",y_pred_train.shape) #np array (879,1)
 print("y_train:", y_train.shape)          #np array (879,1)
 
 #Inverting both y_train and y_pred_train 
-y_pred_train = y_train_scaler.inverse_transform(y_pred_train)
-y_train = y_train_scaler.inverse_transform(y_train) 
+y_pred_train = y_train_scalar.inverse_transform(y_pred_train)
+y_train = y_train_scalar.inverse_transform(y_train) 
 print("y_pred_train:",y_pred_train.shape) #np array (879,1)
 print("y_train:", y_train.shape)          #np array (879,1)
 
