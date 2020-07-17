@@ -13,6 +13,8 @@ from tensorflow.keras.models import Sequential,load_model
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 
 from matplotlib import pyplot as plt
+import tensorflow as tf
+tf.random.set_seed(1337)
 
 #Loading the dataset
 
@@ -112,6 +114,7 @@ y_train_scaler=MinMaxScaler(feature_range=(0,1))
 X_train=X_train_scaler.fit_transform(X_train)
 y_train=y_train_scaler.fit_transform(np.asarray(y_train).reshape(-1,1)) # To make ot 2D, reshaping ..
 
+
 #Reshaping the dataset X_train to 3 dimensional numpy array for lstm
 
 X_train=np.asarray(X_train).reshape(879,3,4)
@@ -132,7 +135,7 @@ model.add(Dense(units=30))
 model.add(Dense(units=20))
 model.add(Dense(units=10))
 model.add(Dense(units=1))
-model.compile(loss='mean_squared_error', optimizer='adam')
+model.compile(loss='mean_squared_error', optimizer='sgd')
 
 
 # printing model summary 
@@ -140,6 +143,8 @@ print(model.summary())
 #Training
 print("Training..")
 history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2)
+
+#history plot yet to be done
 
 loss=model.evaluate(X_train,y_train)
 print("Loss on Train set: ",loss)
