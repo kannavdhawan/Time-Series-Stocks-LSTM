@@ -8,6 +8,8 @@ from sklearn.metrics import accuracy_score
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import tensorflow as tf
+from sklearn.metrics import accuracy_score, mean_squared_error
+import math
 
 # loading scalar
 scalar=pickle.load(open("scalar.pkl","rb"))
@@ -57,9 +59,18 @@ print("Reshaped X_test: \n",X_test.shape)
 
 #  Loading model
 lstm_model=load_model("lstm_model.h5")
-
+# print(X_test)
 # Prediction
 y_pred=lstm_model.predict(X_test)
-lstm_model.evaluate(y_pred,y_test)
+print(y_pred.shape)
+loss=lstm_model.evaluate(X_test,y_test)
+print(loss)
 
+y_pred= y_scalar.inverse_transform(y_pred) 
+y_test= y_scalar.inverse_transform(y_test)
 
+print(y_pred[0])
+print(y_test[0])
+
+rmse_test= math.sqrt(mean_squared_error(y_test, y_pred[:,0]))
+print('Test RMSE: ',rmse_test)

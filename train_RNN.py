@@ -127,7 +127,7 @@ print("y train shape:",y_train.shape)
 # Defining model 
 # model = Sequential()
 # model.add(LSTM(64, input_shape=(3,4)))
-# model.add(LSTM(units=32, return_sequences = True))
+# # model.add(LSTM(units=32, return_sequences = True))
 # model.add(Dense(1))
 # model.compile(loss='mean_squared_error', optimizer='sgd')
 
