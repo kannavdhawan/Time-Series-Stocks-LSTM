@@ -8,16 +8,16 @@ from sklearn.metrics import accuracy_score
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import tensorflow as tf
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.metrics import accuracy_score, mean_squared_error, mean_absolute_error
 import math
 
 # loading scalar
-scalar=pickle.load(open("scalar.pkl","rb"))
+scalar=pickle.load(open(os.path.join("models/","scalar.pkl"),"rb"))
 X_scalar=scalar[0]
 y_scalar=scalar[1]
 
 # test data
-test=pd.read_csv("test_data_RNN.csv", index_col=[0])
+test=pd.read_csv(os.path.join("data/","test_data_RNN.csv"), index_col=[0])
 print(test.head())
 
 X_test=test.iloc[:,0:-1]
@@ -32,7 +32,7 @@ y_test=test['Target']
 # X_scaler_test=MinMaxScaler(feature_range=(0,1))
 # y_scaler_test=MinMaxScaler(feature_range=(0,1))
 
-# train=pd.read_csv("train_data_RNN.csv",index_col=[0])
+# train=pd.read_csv(os.path.join("data/","train_data_RNN.csv"),index_col=[0])
 # X_train=train.iloc[:,:-1]
 # y_train=train['Target']
 
@@ -58,13 +58,14 @@ print("Reshaped X_test: \n",X_test.shape)
 
 
 #  Loading model
-lstm_model=load_model("lstm_model.h5")
+lstm_model=load_model(os.path.join("models/","20831774_RNN_model.h5"))
 # print(X_test)
 # Prediction
 y_pred=lstm_model.predict(X_test)
 print(y_pred.shape)
 loss=lstm_model.evaluate(X_test,y_test)
-print(loss)
+print("Loss on Test set: ",loss)
+
 
 y_pred= y_scalar.inverse_transform(y_pred) 
 y_test= y_scalar.inverse_transform(y_test)
@@ -74,3 +75,19 @@ print(y_test[0])
 
 rmse_test= math.sqrt(mean_squared_error(y_test, y_pred[:,0]))
 print('Test RMSE: ',rmse_test)
+
+mse_test=mean_squared_error(y_test, y_pred)
+print('Test MSE: ',mse_test)
+
+mae_test=mean_absolute_error(y_test, y_pred)
+print('Test MAE: ',mae_test)
+
+
+plt.figure(figsize=(8,8))
+plt.plot(y_pred, "r")
+plt.plot(y_test,"g")
+plt.legend(["Predicted Price","Real Price"])
+plt.xlabel("Days")
+plt.ylabel("Price")
+plt.savefig(os.path.join("data/","True_Predicted_plot_test.png"))
+plt.show()

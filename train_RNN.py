@@ -5,7 +5,7 @@ import numpy as np
 import random
 import math
 import pickle
-
+import os 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -19,23 +19,29 @@ tf.random.set_seed(1337)
 
 #Loading the dataset
 
-# # url='https://raw.githubusercontent.com/kannavdhawan/Time_series_stocks_LSTM/master/q2_dataset.csv?token=AHMAKJAQPICJFWARH35B4US7DEIJE'
-# url="q2_dataset.csv"
-# data=pd.read_csv(url)
+# # path='https://raw.githubusercontent.com/kannavdhawan/Time_series_stocks_LSTM/master/q2_dataset.csv?token=AHMAKJAQPICJFWARH35B4US7DEIJE'
+# path=os.path.join("data/","q2_dataset.csv")
+# data=pd.read_csv(path)
 
 # print(data.head(3))
 # # Dropping the Close/Last column 
 # data_no_close=data.drop([" Close/Last"],axis=1)
 # data_no_close.head(3)
 # data_no_close['Date']=pd.to_datetime(data_no_close['Date'])
+
 # print(data_no_close.head(3))
+
 # data_no_close=data_no_close.sort_values('Date')
+
 # print(data_no_close)
+
 # data_no_close=data_no_close.reset_index(drop=True)
+
 # print(data_no_close.head(3))
 
 
 # data_no_close=data_no_close.iloc[:,1:].values.astype('float32')
+
 # print("rand check: ",data_no_close[0])
 # print(data_no_close.shape)
 
@@ -49,6 +55,7 @@ tf.random.set_seed(1337)
 #     targets.append(data_values[current_day][1])
 #   return features,targets
 # features,targets=feature_gen(data_no_close,3)
+
 # print(features[0])
 # print(features[1])
 # print(targets[0])
@@ -92,13 +99,13 @@ tf.random.set_seed(1337)
 
 # print(train.head(3))
 # print(test.head(3))
-# train.to_csv("train_data_RNN.csv")
-# test.to_csv("test_data_RNN.csv")
+# train.to_csv(os.path.join("data/","train_data_RNN.csv"))
+# test.to_csv(os.path.join("data/","test_data_RNN.csv"))
 
 """
 Loading dataset 
 """
-train=pd.read_csv("train_data_RNN.csv",index_col=[0])
+train=pd.read_csv(os.path.join("data/","train_data_RNN.csv"),index_col=[0])
 
 print(train.head())
 
@@ -118,7 +125,7 @@ X_train=X_train_scalar.fit_transform(X_train)
 y_train=y_train_scalar.fit_transform(np.asarray(y_train).reshape(-1,1)) # To make ot 2D, reshaping ..
 
 scalar.extend([X_train_scalar,y_train_scalar])
-pickle.dump(scalar,open("scalar.pkl", "wb" ))
+pickle.dump(scalar,open(os.path.join("models/","scalar.pkl"), "wb" ))
 #Reshaping the dataset X_train to 3 dimensional numpy array for lstm
 
 X_train=np.asarray(X_train).reshape(879,3,4)
@@ -140,6 +147,7 @@ model.add(Dense(units=20))
 model.add(Dense(units=10))
 model.add(Dense(units=1))
 model.compile(loss='mean_squared_error', optimizer='adam')
+# "sgd":4.48
 
 
 # printing model summary 
@@ -147,8 +155,27 @@ print(model.summary())
 #Training
 print("Training..")
 history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2)
+model.save(os.path.join("models/","20831774_RNN_model.h5"))
+#history plot
+def loss(history):
+    """
+    plots the Training Loss vs Validation Loss
+    """
+    loss=history.history['loss']                    #Get traning loss from model.history
+    # val_loss=history.history['val_loss']            #Get val loss from model.history
+    
+    plt.figure(figsize=(8,7))
 
-#history plot yet to be done
+    plt.plot(loss,'b')
+    # plt.plot(val_loss,'g')
+    # plt.xticks(np.arange(1,6,1))
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title("Training Loss at each epoch")
+    plt.legend(['Training Loss'])
+    plt.show()
+    plt.savefig(os.path.join("data/","Training_loss.png"))
+loss(history)
 
 loss=model.evaluate(X_train,y_train)
 print("Loss on Train set: ",loss)
@@ -172,4 +199,3 @@ print(y_train[0])
 # calculate root mean squared error
 RMSE= math.sqrt(mean_squared_error(y_train, y_pred_train))
 print("RMSE for training data:",RMSE)
-model.save("lstm_model.h5")
