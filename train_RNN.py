@@ -8,7 +8,7 @@ import pickle
 import os 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.metrics import accuracy_score, mean_squared_error,mean_absolute_error
 
 from tensorflow.keras.models import Sequential,load_model
 from tensorflow.keras.layers import LSTM, Dense, Dropout
@@ -146,7 +146,7 @@ model.add(Dense(units=30))
 model.add(Dense(units=20))
 model.add(Dense(units=10))
 model.add(Dense(units=1))
-model.compile(loss='mean_squared_error', optimizer='adam')
+model.compile(loss='mean_squared_error', optimizer='adam',metrics=['mse'])
 # "sgd":4.48
 
 
@@ -161,20 +161,36 @@ def loss(history):
     """
     plots the Training Loss vs Validation Loss
     """
-    loss=history.history['loss']                    #Get traning loss from model.history
-    # val_loss=history.history['val_loss']            #Get val loss from model.history
+   
+    Train_MSE=history.history['mse']                    #Get traning loss from model.history
+    Train_Loss=history.history['loss']
     
-    plt.figure(figsize=(8,7))
+    plot_metrics=[]
+    plot_metrics.extend([Train_MSE,Train_Loss])
+    for metric in plot_metrics:
+            
+        plt.figure(figsize=(8,7))
+        if metric==Train_MSE:
+            metric_name="Training MSE"
+            plt.plot(metric,'r')
+            plt.xlabel("Epochs")
+            plt.ylabel(metric_name)
+            plt.title(metric_name+" at each epoch")
+            plt.legend([metric_name])
+            plt.show()
+            name=metric_name+".png"
+            plt.savefig(os.path.join("data/",name))
+        elif metric==Train_Loss:
+            metric_name="Training Loss"
+            plt.plot(metric,'r')
+            plt.xlabel("Epochs")
+            plt.ylabel(metric_name)
+            plt.title(metric_name+" at each epoch")
+            plt.legend([metric_name])
+            plt.show()
+            name=metric_name+".png"
+            plt.savefig(os.path.join("data/",name))
 
-    plt.plot(loss,'b')
-    # plt.plot(val_loss,'g')
-    # plt.xticks(np.arange(1,6,1))
-    plt.xlabel("Epochs")
-    plt.ylabel("Loss")
-    plt.title("Training Loss at each epoch")
-    plt.legend(['Training Loss'])
-    plt.show()
-    plt.savefig(os.path.join("data/","Training_loss.png"))
 loss(history)
 
 loss=model.evaluate(X_train,y_train)
@@ -197,5 +213,14 @@ print(y_pred_train[0])
 print(y_train[0])
 
 # calculate root mean squared error
-RMSE= math.sqrt(mean_squared_error(y_train, y_pred_train))
-print("RMSE for training data:",RMSE)
+rmse_train= math.sqrt(mean_squared_error(y_train, y_pred_train))
+print("RMSE for training data:",rmse_train)
+
+
+
+mse_train= mean_squared_error(y_train, y_pred_train)
+print('MSE for training data: ',mse_train)
+
+mae_train=mean_absolute_error(y_train, y_pred_train)
+print('MAE for training data: ',mae_train)
+
