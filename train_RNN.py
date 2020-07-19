@@ -212,7 +212,7 @@ def normalize(X_train,y_train):
     # print("y train shape:",y_train.shape)
     return X_train,y_train,X_train_scalar,y_train_scalar
 
-def LSTM(add_dense_32,add_dense_20,add_dense_10,opt):
+def LSTM_RNN(add_dense_32,add_dense_20,add_dense_10,opt):
     """LSTM Model odel Architecture
     Agrs:
         add_dense_32(bool)
@@ -253,7 +253,7 @@ def LSTM(add_dense_32,add_dense_20,add_dense_10,opt):
         model.add(Dense(units=10))                                        # A fully connected dense layer with 10 units
 
     model.add(Dense(units=1))                                             # output fully connected dense layer with 1 unit.
-    model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mse'])     # metrics as mse, opt as sdg and adam during calls, loss as mse.
+    model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mae'])     # metrics as mse, opt as sdg and adam during calls, loss as mse.
     
     print(model.summary())                                                # printing model summary
 
@@ -275,12 +275,12 @@ X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 
 # Training.. 
 
-model=LSTM(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
-# model=LSTM(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam')
-# model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam')
+# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
+# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='sgd')
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam')
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam')
 
-# model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam')
-# model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='sgd')
+model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam')
 
 history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2) #Fitting the model
 
@@ -289,7 +289,7 @@ model.save(os.path.join("models/","20831774_RNN_model.h5"))               #Savin
 train_metrics_plot(history)                                               #Plotting the Training loss and MSE
 
 loss=model.evaluate(X_train,y_train)                                      #Evaluating the model on train data for overall loss.
-print("Loss on Train set: ",loss)
+print("\n\nLoss and MAE on Train set: ",loss)
 
 y_pred_train= model.predict(X_train)                                      #To get the overall metric results while training
 
@@ -300,8 +300,9 @@ y_pred_train= model.predict(X_train)                                      #To ge
 y_pred_train = y_train_scalar.inverse_transform(y_pred_train)    #Inverting both y_train and y_pred_train to get real values. 
 y_train = y_train_scalar.inverse_transform(y_train) 
 
-print("Random Testing for Training data \n Predicted: ",y_pred_train[0])
+print("\n\nRandom Testing for Training data \n\nPredicted: ",y_pred_train[0])
 print("Target: ",y_train[0])
 
 # MAE,MSE,RMSE from utils call for training data 
+print("\n\nDifferent Losses after inverting the prices to real scale for Train Data: \n")
 metric_errors(y_train,y_pred_train,flag="Train")

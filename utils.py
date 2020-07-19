@@ -25,19 +25,19 @@ def data_load(data_path):
 #history plot
 def train_metrics_plot(history):
     """
-    plots the Training Loss and training MSE at each epoch..
+    plots the Training Loss and training MAE at each epoch..
     """
-   
-    Train_MSE=history.history['mse']                    #Get traning loss from hist_object.history
+    print("Plotting train loss and mse..")
+    Train_MAE=history.history['mae']                    #Get traning loss from hist_object.history
     Train_Loss=history.history['loss']
     
     plot_metrics=[]
-    plot_metrics.extend([Train_MSE,Train_Loss])
+    plot_metrics.extend([Train_MAE,Train_Loss])
     for metric in plot_metrics:
             
         plt.figure(figsize=(8,7))
-        if metric==Train_MSE:
-            metric_name="Training MSE"
+        if metric==Train_MAE:
+            metric_name="Training MAE"
             plt.plot(metric,'r')
             plt.xlabel("Epochs")
             plt.ylabel(metric_name)

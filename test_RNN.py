@@ -25,6 +25,7 @@ def load_files(path_sc,path_test):
             X_scalar
             y_scalar
     """
+    print("Loading files..")
     scalar=pickle.load(open(path_sc,"rb"))
     X_scalar=scalar[0]
     y_scalar=scalar[1]
@@ -67,7 +68,7 @@ def preprocess_test(X_test,y_test,X_scalar,y_scalar):
         X_test: preprocessed time series np array ready for lstm.
         y_test: preprocessed np array having labels for test data.
     """
-
+    print("Preprocessing Test data..")
     X_test=X_scalar.transform(X_test)                           #Normalizing the data features with same mean and sd as of train data.
     y_test=y_scalar.transform(np.asarray(y_test).reshape(-1,1)) #Normalizing the labels and reshaping into a 2-d np array.
 
@@ -102,12 +103,13 @@ def pred(path_model,X_test,y_test,y_scalar):
         y_test: Real values/price inverse transformed 
 
     """
+    print("Predicting and calculating loss..")
     lstm_model=load_model(path_model)   #loading the model     
     y_pred=lstm_model.predict(X_test)   #predicting the price
     # print(y_pred.shape)
 
     loss=lstm_model.evaluate(X_test,y_test)
-    print("Loss on Test set: ",loss)
+    print("Loss and MAE on Test set: ",loss)
 
     y_pred= y_scalar.inverse_transform(y_pred)  # converting back to real values 
     y_test= y_scalar.inverse_transform(y_test)  # converting real labels back to real values
@@ -118,7 +120,10 @@ def pred(path_model,X_test,y_test,y_scalar):
     return y_pred,y_test
 
 def plot_acc(y_pred,y_test):
-
+    """
+    Plots the graph for predicted and real prices for test data..
+    """
+    print("Plotting Predicted and Real prices..")
     plt.figure(figsize=(8,8))
     plt.plot(y_pred, "r")
     plt.plot(y_test,"g")
@@ -138,6 +143,7 @@ X_test,y_test=preprocess_test(X_test,y_test,X_scalar,y_scalar)
 y_pred,y_test=pred(os.path.join("models/","20831774_RNN_model.h5"),X_test,y_test,y_scalar)
 
 # MAE,MSE,RMSE from utils call for test data 
+print("\n\nDifferent Losses after inverting the prices to real scale for Test Data: \n")
 metric_errors(y_test,y_pred,flag="Test")
 
 # Plotting the curve with predicted and real values for test data
