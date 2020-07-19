@@ -36,7 +36,7 @@ def raw_data(path):
         data_no_close: A numpy array with float values with no 'close' column.
 
     """
-    print("Loading data..")
+    print("Loading Raw data..")
 
     # path='https://raw.githubusercontent.com/kannavdhawan/Time_series_stocks_LSTM/master/q2_dataset.csv?token=AHMAKJAQPICJFWARH35B4US7DEIJE'
 
@@ -80,6 +80,7 @@ def feature_gen(data_values,size):
         targets(list): [1256]
 
     """
+    print("Feature generation..")
     features=[]
     targets=[]
     old_days=size
@@ -110,7 +111,8 @@ def split(features,targets):
         Saves the csv files in data/ directory for tarin and test data with labels.
 
     """
-    
+    print("Splitting..")
+
     # shuffling the dataset
     zipped_f_t=list(zip(features,targets))
     random.shuffle(zipped_f_t)                           #shuffling the zipped object with features and labels
@@ -186,6 +188,7 @@ def normalize(X_train,y_train):
         X_train: Reshaped time series numpy array of shape (879,3,4) readyto be fed into our RNN.
         y_train: 2- dimensional numpy array with shape (879,1)
     """
+    print("Normalizing..")
     #scaling 
     scalar=[]
     X_train_scalar=MinMaxScaler(feature_range=(0,1))    #setting the range between 0 and 1. scalar for features.
@@ -206,11 +209,25 @@ def normalize(X_train,y_train):
 # Normalizing the train dataset and reshaping.
 X_train,y_train=normalize(X_train,y_train)
 
-def LSTM():
+def LSTM(add_dense_32,add_dense_20,add_dense_10,opt):
+    """LSTM Model odel Architecture
+    Agrs:
+        add_dense_32(bool)
+        add_dense_20(bool)
+        add_dense_10(bool)
+        opt(str)
 
+    Arguments:
+        add_dense_32(bool): If True, adding a dense layer with 32 units after 2 hidden layers.
+        add_dense_20(bool): If True, adding a dense layer with 20 units.
+        add_dense_10(bool): If True, adding a dense layer with 10 units.
+        opt(str): A string with optimizer name.
 
+    Returns: 
+        model(ob): compiled model 
+    """
     print("Training..")
-    # Defining model 
+
     # model = Sequential()
     # model.add(LSTM(64, input_shape=(3,4)))
     # # model.add(LSTM(units=32, return_sequences = True))
@@ -218,17 +235,37 @@ def LSTM():
     # model.compile(loss='mean_squared_error', optimizer='sgd')
 
     model= Sequential()
-    model.add(LSTM(units=32, return_sequences= True, input_shape=(3,4))),
-    model.add(LSTM(units=10, return_sequences= False)),
-    model.add(Dense(units=32))
-    model.add(Dense(units=20))      
-    model.add(Dense(units=10))
-    model.add(Dense(units=1))
-    model.compile(loss='mean_squared_error', optimizer='adam',metrics=['mse']) 
+
+    model.add(LSTM(units=32, return_sequences= True, input_shape=(3,4)))  # Hidden lstm layer with 32 units.
+
+    model.add(LSTM(units=10, return_sequences= False))                    # Hidden lstm layer with 10 units.
+
+    if add_dense_32:        
+        model.add(Dense(units=32))
+    
+    if add_dense_20:
+        model.add(Dense(units=20))
+    
+    if add_dense_10:
+        model.add(Dense(units=10))
+
+    model.add(Dense(units=1))           # output fully connected dense layer with 1 unit.
+    model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mse']) 
+    
     print(model.summary())              # printing model summary
+
     return model 
     
-model=LSTM()
+model=LSTM(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
+"""
+Please uncomment the one you want to 
+"""
+model=LSTM(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam')
+model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam')
+
+model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam')
+model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='sgd')
+
 history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2)
 model.save(os.path.join("models/","20831774_RNN_model.h5"))
 #history plot
