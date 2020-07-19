@@ -1,5 +1,4 @@
 # Imports
-
 import pandas as pd
 import numpy as np
 import random
@@ -8,8 +7,8 @@ import pickle
 import os 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, mean_squared_error,mean_absolute_error
 
+from sklearn.metrics import accuracy_score, mean_squared_error,mean_absolute_error
 from tensorflow.keras.models import Sequential,load_model
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 
@@ -18,7 +17,7 @@ import tensorflow as tf
 
 tf.random.set_seed(1337) # setting seed 
 
-from utils import data_load
+from utils import data_load , train_metrics_plot, metric_errors
 
 #Loading the dataset
 def raw_data(path):
@@ -168,8 +167,6 @@ features,targets=feature_gen(data_no_close,win_size)
 # Preprocessing and saving preprocessed dataset 
 split(features,targets)
 
-# Loading prerocessed data from utils call
-X_train,y_train=data_load(os.path.join("data/","train_data_RNN.csv"))
 
 def normalize(X_train,y_train):
     """
@@ -204,10 +201,7 @@ def normalize(X_train,y_train):
    
     # print("X_train shape: ",X_train.shape)
     # print("y train shape:",y_train.shape)
-    return X_train,y_train
-
-# Normalizing the train dataset and reshaping.
-X_train,y_train=normalize(X_train,y_train)
+    return X_train,y_train,X_train_scalar,y_train_scalar
 
 def LSTM(add_dense_32,add_dense_20,add_dense_10,opt):
     """LSTM Model odel Architecture
@@ -256,83 +250,46 @@ def LSTM(add_dense_32,add_dense_20,add_dense_10,opt):
 
     return model 
     
-model=LSTM(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
-"""
-Please uncomment the one you want to 
-"""
-model=LSTM(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam')
-model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam')
-
-model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam')
-model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='sgd')
-
-history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2)
-model.save(os.path.join("models/","20831774_RNN_model.h5"))
-#history plot
-def loss(history):
-    """
-    plots the Training Loss vs Validation Loss
-    """
-   
-    Train_MSE=history.history['mse']                    #Get traning loss from model.history
-    Train_Loss=history.history['loss']
     
-    plot_metrics=[]
-    plot_metrics.extend([Train_MSE,Train_Loss])
-    for metric in plot_metrics:
-            
-        plt.figure(figsize=(8,7))
-        if metric==Train_MSE:
-            metric_name="Training MSE"
-            plt.plot(metric,'r')
-            plt.xlabel("Epochs")
-            plt.ylabel(metric_name)
-            plt.title(metric_name+" at each epoch")
-            plt.legend([metric_name])
-            plt.show()
-            name=metric_name+".png"
-            plt.savefig(os.path.join("data/",name))
-        elif metric==Train_Loss:
-            metric_name="Training Loss"
-            plt.plot(metric,'r')
-            plt.xlabel("Epochs")
-            plt.ylabel(metric_name)
-            plt.title(metric_name+" at each epoch")
-            plt.legend([metric_name])
-            plt.show()
-            name=metric_name+".png"
-            plt.savefig(os.path.join("data/",name))
+# Loading prerocessed data from utils call
+X_train,y_train=data_load(os.path.join("data/","train_data_RNN.csv"))
 
-loss(history)
+# Normalizing the train dataset and reshaping.
+X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 
-loss=model.evaluate(X_train,y_train)
+
+"""
+Please uncomment the Architecture.. 
+"""
+# Training.. 
+
+model=LSTM(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
+# model=LSTM(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam')
+# model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam')
+
+# model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam')
+# model=LSTM(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='sgd')
+
+history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2) #Fitting the model
+
+model.save(os.path.join("models/","20831774_RNN_model.h5"))               #Saving the fitted model
+
+train_metrics_plot(history)                                               #Plotting the Training loss and MSE
+
+loss=model.evaluate(X_train,y_train)                                      #Evaluating the model on train data for overall loss.
 print("Loss on Train set: ",loss)
 
-# Just to get the RMSE for train data ..
+y_pred_train= model.predict(X_train)                                     # To get the overall metric results while training
 
-y_pred_train = model.predict(X_train)
+# print("y_pred_train:",y_pred_train.shape) #np array (879,1)
+# print("y_train:", y_train.shape)          #np array (879,1)
 
-print("y_pred_train:",y_pred_train.shape) #np array (879,1)
-print("y_train:", y_train.shape)          #np array (879,1)
 
-#Inverting both y_train and y_pred_train 
-y_pred_train = y_train_scalar.inverse_transform(y_pred_train)
+y_pred_train = y_train_scalar.inverse_transform(y_pred_train)    #Inverting both y_train and y_pred_train to get real values. 
 y_train = y_train_scalar.inverse_transform(y_train) 
-print("y_pred_train:",y_pred_train.shape) #np array (879,1)
-print("y_train:", y_train.shape)          #np array (879,1)
 
-print(y_pred_train[0])
-print(y_train[0])
+print("Random Testing for Training data \n Predicted: ",y_pred_train[0])
+print("Target: ",y_train[0])
 
-# calculate root mean squared error
-rmse_train= math.sqrt(mean_squared_error(y_train, y_pred_train))
-print("RMSE for training data:",rmse_train)
-
-
-
-mse_train= mean_squared_error(y_train, y_pred_train)
-print('MSE for training data: ',mse_train)
-
-mae_train=mean_absolute_error(y_train, y_pred_train)
-print('MAE for training data: ',mae_train)
-
+# MAE,MSE,RMSE from utils call for training data 
+metric_errors(y_train,y_pred_train)
