@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import os 
 import math
 from sklearn.metrics import accuracy_score, mean_squared_error,mean_absolute_error
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # for ignoring warnings on console 
+import tensorflow as tf
+
 
 
 def main():
@@ -54,17 +57,17 @@ def train_metrics_plot(history):
             name=metric_name+".png"
             plt.savefig(os.path.join("data/",name))
 
-def metric_errors(real,pred):
-    """ calculate root mean squared error.
+def metric_errors(real,pred,flag):
+    """ calculate root mean squared error, MSE and MAE.
     """
-    rmse_train= math.sqrt(mean_squared_error(real,pred))
-    print("RMSE for training data:",rmse_train)
+    rmse= math.sqrt(mean_squared_error(real,pred))
+    print(flag+" RMSE :",rmse)
 
-    mse_train= mean_squared_error(real,pred)
-    print('MSE for training data: ',mse_train)
+    mse= mean_squared_error(real,pred)
+    print(flag+' MSE : ',mse)
 
-    mae_train=mean_absolute_error(real,pred)
-    print('MAE for training data: ',mae_train)
+    mae=mean_absolute_error(real,pred)
+    print(flag+' MAE : ',mae)
 
 
 if __name__ == "__main__":

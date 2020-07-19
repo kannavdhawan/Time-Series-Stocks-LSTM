@@ -14,8 +14,10 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout
 
 from matplotlib import pyplot as plt
 import tensorflow as tf
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+import tensorflow as tf
 tf.random.set_seed(1337) # setting seed 
+random.seed(1337)
 
 from utils import data_load , train_metrics_plot, metric_errors
 
@@ -168,6 +170,13 @@ features,targets=feature_gen(data_no_close,win_size)
 split(features,targets)
 
 
+
+"""
+Time series csv's created above
+"""
+
+
+
 def normalize(X_train,y_train):
     """
     Normalizing the dataset using Minmaxscalar and saving the objects in a pickle file for saving the mean and stand dev. 
@@ -197,7 +206,7 @@ def normalize(X_train,y_train):
     scalar.extend([X_train_scalar,y_train_scalar])      # serialized objects to be saved in pkl file
     pickle.dump(scalar,open(os.path.join("models/","scalar.pkl"), "wb" ))   # writing pickle file
     
-    X_train=np.asarray(X_train).reshape(879,3,4)    #Reshaping the dataset X_train to 3 dimensional numpy array for lstm
+    X_train=np.asarray(X_train).reshape(X_train.shape[0],3,4)    #Reshaping the dataset X_train to 3 dimensional numpy array for lstm
    
     # print("X_train shape: ",X_train.shape)
     # print("y train shape:",y_train.shape)
@@ -235,32 +244,35 @@ def LSTM(add_dense_32,add_dense_20,add_dense_10,opt):
     model.add(LSTM(units=10, return_sequences= False))                    # Hidden lstm layer with 10 units.
 
     if add_dense_32:        
-        model.add(Dense(units=32))
+        model.add(Dense(units=32))                                        # A fully connected dense layer with 32 units
     
     if add_dense_20:
-        model.add(Dense(units=20))
+        model.add(Dense(units=20))                                        # A fully connected dense layer with 20 units
     
     if add_dense_10:
-        model.add(Dense(units=10))
+        model.add(Dense(units=10))                                        # A fully connected dense layer with 10 units
 
-    model.add(Dense(units=1))           # output fully connected dense layer with 1 unit.
-    model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mse']) 
+    model.add(Dense(units=1))                                             # output fully connected dense layer with 1 unit.
+    model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mse'])     # metrics as mse, opt as sdg and adam during calls, loss as mse.
     
-    print(model.summary())              # printing model summary
+    print(model.summary())                                                # printing model summary
 
     return model 
     
-    
+ 
+
+"""
+Function calls..//
+
+Please uncomment the Required Architecture.. 
+"""
+   
 # Loading prerocessed data from utils call
 X_train,y_train=data_load(os.path.join("data/","train_data_RNN.csv"))
 
 # Normalizing the train dataset and reshaping.
 X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 
-
-"""
-Please uncomment the Architecture.. 
-"""
 # Training.. 
 
 model=LSTM(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
@@ -279,7 +291,7 @@ train_metrics_plot(history)                                               #Plott
 loss=model.evaluate(X_train,y_train)                                      #Evaluating the model on train data for overall loss.
 print("Loss on Train set: ",loss)
 
-y_pred_train= model.predict(X_train)                                     # To get the overall metric results while training
+y_pred_train= model.predict(X_train)                                      #To get the overall metric results while training
 
 # print("y_pred_train:",y_pred_train.shape) #np array (879,1)
 # print("y_train:", y_train.shape)          #np array (879,1)
@@ -292,4 +304,4 @@ print("Random Testing for Training data \n Predicted: ",y_pred_train[0])
 print("Target: ",y_train[0])
 
 # MAE,MSE,RMSE from utils call for training data 
-metric_errors(y_train,y_pred_train)
+metric_errors(y_train,y_pred_train,flag="Train")
