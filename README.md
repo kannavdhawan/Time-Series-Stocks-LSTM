@@ -32,7 +32,6 @@ Layer (type)         |        Output Shape        |      Param #
 lstm (LSTM)          |       (None, 3, 32)         |    4736      
 lstm_1 (LSTM)         |       (None, 10)            |    1720      
 dense (Dense)          |      (None, 1)              |   11        
-=================================================================
 
 - Total params: 6,467
 - Trainable params: 6,467
@@ -67,7 +66,7 @@ Layer (type)         |        Output Shape        |      Param #
 lstm (LSTM)          |       (None, 3, 32)         |    4736      
 lstm_1 (LSTM)         |       (None, 10)            |    1720      
 dense (Dense)          |      (None, 1)              |   11        
-=================================================================
+
 - Total params: 6,467
 - Trainable params: 6,467
 - Non-trainable params: 0
@@ -140,7 +139,7 @@ lstm_1 (LSTM)|                (None, 10)      |          1720
 dense (Dense) |               (None, 32)       |         352       
 dense_1 (Dense)|              (None, 20)        |        660       
 dense_2 (Dense) |             (None, 1)          |       21        
-=================================================================
+
 - Total params: 7,489
 - Trainable params: 7,489
 - Non-trainable params: 0
@@ -173,7 +172,7 @@ dense (Dense)       |         (None, 32)        |        352
 dense_1 (Dense)      |        (None, 20)         |       660       
 dense_2 (Dense)       |       (None, 10)          |      210       
 dense_3 (Dense)        |      (None, 1)            |     11        
-=================================================================
+
 - Total params: 7,689
 - Trainable params: 7,689
 - Non-trainable params: 0
