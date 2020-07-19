@@ -18,7 +18,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 tf.random.set_seed(1337) # setting seed 
 random.seed(1337)
-
+# from keras.utils.vis_utils import plot_model
 from utils import data_load , train_metrics_plot, metric_errors
 
 #Loading the dataset
@@ -231,32 +231,35 @@ def LSTM_RNN(add_dense_32,add_dense_20,add_dense_10,opt):
     """
     print("Training..")
 
-    # model = Sequential()
-    # model.add(LSTM(64, input_shape=(3,4)))
-    # # model.add(LSTM(units=32, return_sequences = True))
-    # model.add(Dense(1))
-    # model.compile(loss='mean_squared_error', optimizer='sgd')
-
-    model= Sequential()
-
-    model.add(LSTM(units=32, return_sequences= True, input_shape=(3,4)))  # Hidden lstm layer with 32 units.
-
-    model.add(LSTM(units=10, return_sequences= False))                    # Hidden lstm layer with 10 units.
-
-    if add_dense_32:        
-        model.add(Dense(units=32))                                        # A fully connected dense layer with 32 units
+    model = Sequential()
+    model.add(LSTM(64, input_shape=(3,4)))
+    # model.add(LSTM(units=32, return_sequences = True))
+    # model.add(Dense(10))
+    model.add(Dense(1))
+    model.compile(loss='mean_squared_error', optimizer='adam',metrics=['mae'])
     
-    if add_dense_20:
-        model.add(Dense(units=20))                                        # A fully connected dense layer with 20 units
-    
-    if add_dense_10:
-        model.add(Dense(units=10))                                        # A fully connected dense layer with 10 units
+    # model= Sequential()
 
-    model.add(Dense(units=1))                                             # output fully connected dense layer with 1 unit.
-    model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mae'])     # metrics as mse, opt as sdg and adam during calls, loss as mse.
+    # model.add(LSTM(units=32, return_sequences= True, input_shape=(3,4)))  # Hidden lstm layer with 32 units.
+
+    # model.add(LSTM(units=10, return_sequences= False))                    # Hidden lstm layer with 10 units.
+
+
+    # if add_dense_32:        
+    #     model.add(Dense(units=32))                                        # A fully connected dense layer with 32 units
+    
+    # if add_dense_20:
+    #     model.add(Dense(units=20))                                        # A fully connected dense layer with 20 units
+    
+    # if add_dense_10:
+    #     model.add(Dense(units=10))                                        # A fully connected dense layer with 10 units
+
+    # model.add(Dense(units=1))                                             # output fully connected dense layer with 1 unit.
+    # model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mae'])     # metrics as mse, opt as sdg and adam during calls, loss as mse.
     
     print(model.summary())                                                # printing model summary
-
+    
+    # plot_model(model, to_file='data/mlp_base.png', show_shapes=True, show_layer_names=True)
     return model 
     
  
@@ -281,6 +284,10 @@ X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 # model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam')
 
 model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam')
+
+
+# history=model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)     # on first model only   
+# history=model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=2)      # on first model only   
 
 history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2) #Fitting the model
 

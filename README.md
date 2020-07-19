@@ -6,7 +6,7 @@
         - `python3 Time_series_stocks_LSTM/test_RNN.py `
 - Note: 
     - Models Run on Batch size=10 and epochs 100 unless implitly mentioned.
-
+    - For Detailed Model selection, please refer the report added in pdf format.
 ### Epochs= 100 | Batch size= 50 | model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
 - Train RMSE : 4.883128665710501
 - Train MSE :  23.84494556588362
@@ -25,6 +25,35 @@
 #### Note:
 1. Batch_size=10
 2. Epochs=100
+
+### Model | Epochs: 100, Batch_size: 10 
+Layer (type)        |         Output Shape   |           Param #   
+----|-----|-----
+lstm (LSTM)          |        (None, 64)      |          17664     
+dense (Dense)         |       (None, 1)        |         65        
+
+- Total params: 17,729
+- Trainable params: 17,729
+- Non-trainable params: 0
+- Loss and MAE on Train set:  [0.00010530659346841276, 0.006131733302026987]
+- Random Testing for Training data 
+
+    - Predicted:  [110.774376]
+    - Target:  [112.30999756]
+
+- Different Losses after inverting the prices to real scale for Train Data: 
+
+    - Train RMSE : 2.942291786509576
+    - Train MSE :  8.657080956961714
+    - Train MAE :  1.7580904391031613
+- Loss and MAE on Test set:  [0.00010609572200337425, 0.005971579812467098]
+- Random Testing for Test data 
+    - Predicted:  [219.45885]
+    - Target:  [222.30000305]
+- Different Losses after inverting the prices to real scale for Test Data: 
+    - Test RMSE : 2.9532958992995972
+    - Test MSE :  8.721956668819818
+    - Test MAE :  1.7121710941709316
 ### model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
 
 Layer (type)         |        Output Shape        |      Param #   
