@@ -212,7 +212,7 @@ def normalize(X_train,y_train):
     # print("y train shape:",y_train.shape)
     return X_train,y_train,X_train_scalar,y_train_scalar
 
-def LSTM_RNN(add_dense_32,add_dense_20,add_dense_10,opt):
+def LSTM_RNN(add_dense_32,add_dense_20,add_dense_10,opt,base=True):
     """LSTM Model odel Architecture
     Agrs:
         add_dense_32(bool)
@@ -231,35 +231,37 @@ def LSTM_RNN(add_dense_32,add_dense_20,add_dense_10,opt):
     """
     print("Training..")
 
-    model = Sequential()
-    model.add(LSTM(64, input_shape=(3,4)))
-    # model.add(LSTM(units=32, return_sequences = True))
-    # model.add(Dense(10))
-    model.add(Dense(1))
-    model.compile(loss='mean_squared_error', optimizer='adam',metrics=['mae'])
-    
-    # model= Sequential()
+    if base:
 
-    # model.add(LSTM(units=32, return_sequences= True, input_shape=(3,4)))  # Hidden lstm layer with 32 units.
+        model = Sequential()
+        model.add(LSTM(64, input_shape=(3,4)))
+        # model.add(LSTM(units=32))
+        # model.add(Dense(10))
+        model.add(Dense(1))
+        model.compile(loss='mean_squared_error', optimizer='adam',metrics=['mae'])
+    else:
+        model= Sequential()
 
-    # model.add(LSTM(units=10, return_sequences= False))                    # Hidden lstm layer with 10 units.
+        model.add(LSTM(units=32, return_sequences= True, input_shape=(3,4)))  # Hidden lstm layer with 32 units.
+
+        model.add(LSTM(units=10, return_sequences= False))                    # Hidden lstm layer with 10 units.
 
 
-    # if add_dense_32:        
-    #     model.add(Dense(units=32))                                        # A fully connected dense layer with 32 units
-    
-    # if add_dense_20:
-    #     model.add(Dense(units=20))                                        # A fully connected dense layer with 20 units
-    
-    # if add_dense_10:
-    #     model.add(Dense(units=10))                                        # A fully connected dense layer with 10 units
+        if add_dense_32:        
+            model.add(Dense(units=32))                                        # A fully connected dense layer with 32 units
+        
+        if add_dense_20:
+            model.add(Dense(units=20))                                        # A fully connected dense layer with 20 units
+        
+        if add_dense_10:
+            model.add(Dense(units=10))                                        # A fully connected dense layer with 10 units
 
-    # model.add(Dense(units=1))                                             # output fully connected dense layer with 1 unit.
-    # model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mae'])     # metrics as mse, opt as sdg and adam during calls, loss as mse.
-    
+        model.add(Dense(units=1))                                             # output fully connected dense layer with 1 unit.
+        model.compile(loss='mean_squared_error', optimizer=opt,metrics=['mae'])     # metrics as mse, opt as sdg and adam during calls, loss as mse.
+        
     print(model.summary())                                                # printing model summary
-    
-    # plot_model(model, to_file='data/mlp_base.png', show_shapes=True, show_layer_names=True)
+        
+        # plot_model(model, to_file='data/mlp_base.png', show_shapes=True, show_layer_names=True)
     return model 
     
  
@@ -278,16 +280,18 @@ X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 
 # Training.. 
 
-# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam')
-# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='sgd')
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam')
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam')
+model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=True)
 
-model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam')
+# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=False)
+# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='sgd',base=False)
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam',base=False)
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam',base=False)
+
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam',base=False)
 
 
-# history=model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)     # on first model only   
-# history=model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=2)      # on first model only   
+# history=model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)     # on second model only   
+# history=model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=2)      # on second model only   
 
 history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2) #Fitting the model
 
