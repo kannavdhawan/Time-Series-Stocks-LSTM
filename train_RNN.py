@@ -167,16 +167,17 @@ def split(features,targets):
 
 """
 //CALLS FOR CREATING TIME SERIES DATASET//
+Please uncomment if you want to re split and re create the data.
 """
-# Loading dataset from csv
-data_no_close=raw_data(os.path.join("data/","q2_dataset.csv"))
 
-# Generating features
-win_size=3
-features,targets=feature_gen(data_no_close,win_size)
+# data_no_close=raw_data(os.path.join("data/","q2_dataset.csv"))          # Loading dataset from csv
 
-# Preprocessing and saving preprocessed dataset 
-split(features,targets)
+
+# win_size=3
+# features,targets=feature_gen(data_no_close,win_size)                    # Generating features
+
+
+# split(features,targets)                                                 # Preprocessing and saving preprocessed dataset 
 
 
 
@@ -185,6 +186,7 @@ Time series csv's created above
 """
 
 
+# train_data_RNN.csv is loaded below at function calls using utils "data_load" function. 
 
 def normalize(X_train,y_train):
     """
@@ -289,18 +291,18 @@ X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 
 # Training.. 
 
-model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=True)
+model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=True)           #Architecture-1 
+    
+# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=False)        #Architecture-2
+# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='sgd',base=False)         #Architecture-3
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam',base=False)         #Architecture-4
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam',base=False)          #Architecture-5
 
-# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=False)
-# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='sgd',base=False)
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam',base=False)
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam',base=False)
-
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam',base=False)
+# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam',base=False)           #Architecture-6
 
 
-# history=model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)     # on second model only   
-# history=model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=2)      # on second model only   
+# history=model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)                             # on second model only   
+# history=model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=2)                              # on second model only   
 
 history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2) #Fitting the model
 
