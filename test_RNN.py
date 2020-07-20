@@ -125,8 +125,8 @@ def plot_acc(y_pred,y_test):
     """
     print("Plotting Predicted and Real prices..")
     plt.figure(figsize=(8,8))
-    plt.plot(y_pred[0:50], "r")
-    plt.plot(y_test[0:50],"g")
+    plt.plot(y_pred,"r")
+    plt.plot(y_test,"g")
     plt.legend(["Predicted Price","Real Price"])
     plt.xlabel("Days")
     plt.ylabel("Price")
