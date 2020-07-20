@@ -146,7 +146,7 @@ y_pred_df=pd.DataFrame(y_pred,columns=['Predicted Price'])
 y_test_df=pd.DataFrame(y_test,columns=['Real Price'])
 
 y_df=pd.concat([y_pred_df.reset_index(drop=True),y_test_df.reset_index(drop=True)],axis=1)
-print(y_df.head(10))
+print(y_df.iloc[10:20,:].reset_index(drop=True))
 
 # MAE,MSE,RMSE from utils call for test data 
 print("\n\nDifferent Losses after inverting the prices to real scale for Test Data: \n")

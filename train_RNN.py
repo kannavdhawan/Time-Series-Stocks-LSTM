@@ -55,11 +55,20 @@ def raw_data(path):
 
     data_no_close=data_no_close.reset_index(drop=True)          # Reseting the reversed index after sorting.
     # print("Reset index ds..:\n",data_no_close.head(3))
+    """
+    calculating the average percentage change for better analysis in the end.
+
+    """
+    
+    # ma= data_no_close[' Open'].rolling(window=3).mean()
+
+    # print(data_no_close[' Open'].pct_change().mean()*1256) #1.3296575036506153
+    
 
     data_no_close=data_no_close.iloc[:,1:].values.astype('float32')     #converting into np array and 'float32'.  {Already floats!~Volume}
     # print("np array floats..:\n",data_no_close[0])
     # print("Shape np array=> ",data_no_close.shape)
-
+    
     return data_no_close
 
 
