@@ -125,8 +125,8 @@ def plot_acc(y_pred,y_test):
     """
     print("Plotting Predicted and Real prices..")
     plt.figure(figsize=(8,8))
-    plt.plot(y_pred, "r")
-    plt.plot(y_test,"g")
+    plt.plot(y_pred[0:50], "r")
+    plt.plot(y_test[0:50],"g")
     plt.legend(["Predicted Price","Real Price"])
     plt.xlabel("Days")
     plt.ylabel("Price")
@@ -141,6 +141,12 @@ X_test,y_test=preprocess_test(X_test,y_test,X_scalar,y_scalar)
 
 # Predicting the price for next day using lstm for test data and calculating loss.
 y_pred,y_test=pred(os.path.join("models/","20831774_RNN_model.h5"),X_test,y_test,y_scalar)
+
+y_pred_df=pd.DataFrame(y_pred,columns=['Predicted Price'])
+y_test_df=pd.DataFrame(y_test,columns=['Real Price'])
+
+y_df=pd.concat([y_pred_df.reset_index(drop=True),y_test_df.reset_index(drop=True)],axis=1)
+print(y_df.head(10))
 
 # MAE,MSE,RMSE from utils call for test data 
 print("\n\nDifferent Losses after inverting the prices to real scale for Test Data: \n")
