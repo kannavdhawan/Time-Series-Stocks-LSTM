@@ -34,7 +34,7 @@ def load_files(path_sc,path_test):
 
     return X_test,y_test,X_scalar,y_scalar
 
-"""scaling with same mean and sd | please uncomment if don't want to use pickkle file of saved scalar..
+"""scaling with same mean and sd | Not using this below because I am using the saved file
 """
 # X_scaler_test=MinMaxScaler(feature_range=(0,1))
 # y_scaler_test=MinMaxScaler(feature_range=(0,1))
@@ -108,7 +108,7 @@ def pred(path_model,X_test,y_test,y_scalar):
     y_pred=lstm_model.predict(X_test)   #predicting the price
     # print(y_pred.shape)
 
-    loss=lstm_model.evaluate(X_test,y_test)
+    loss=lstm_model.evaluate(X_test,y_test,verbose=2)
     print("Loss and MAE on Test set: ",loss)
 
     y_pred= y_scalar.inverse_transform(y_pred)  # converting back to real values 
@@ -133,24 +133,27 @@ def plot_acc(y_pred,y_test):
     plt.savefig(os.path.join("data/","True_Predicted_plot_test.png"))
     plt.show()
 
-# Loading scalar and csv..
-X_test,y_test,X_scalar,y_scalar=load_files(os.path.join("models/","scalar.pkl"),os.path.join("data/","test_data_RNN.csv"))
+if __name__ == "__main__":
+        
+    # Loading scalar and testing csv..
+    X_test,y_test,X_scalar,y_scalar=load_files(os.path.join("models/","scalar.pkl"),os.path.join("data/","test_data_RNN.csv"))
 
-# Preprocssing the test data
-X_test,y_test=preprocess_test(X_test,y_test,X_scalar,y_scalar)
+    # Preprocssing the test data
+    X_test,y_test=preprocess_test(X_test,y_test,X_scalar,y_scalar)
 
-# Predicting the price for next day using lstm for test data and calculating loss.
-y_pred,y_test=pred(os.path.join("models/","20831774_RNN_model.h5"),X_test,y_test,y_scalar)
+    # Loading model and Predicting the price for next day using lstm for test data and calculating loss.
+    y_pred,y_test=pred(os.path.join("models/","20831774_RNN_model.h5"),X_test,y_test,y_scalar)
 
-y_pred_df=pd.DataFrame(y_pred,columns=['Predicted Price'])
-y_test_df=pd.DataFrame(y_test,columns=['Real Price'])
+    #printing part of predicted values
+    y_pred_df=pd.DataFrame(y_pred,columns=['Predicted Price'])
+    y_test_df=pd.DataFrame(y_test,columns=['Real Price'])
 
-y_df=pd.concat([y_pred_df.reset_index(drop=True),y_test_df.reset_index(drop=True)],axis=1)
-print(y_df.iloc[10:20,:].reset_index(drop=True))
+    y_df=pd.concat([y_pred_df.reset_index(drop=True),y_test_df.reset_index(drop=True)],axis=1)
+    print(y_df.iloc[10:20,:].reset_index(drop=True))
 
-# MAE,MSE,RMSE from utils call for test data 
-print("\n\nDifferent Losses after inverting the prices to real scale for Test Data: \n")
-metric_errors(y_test,y_pred,flag="Test")
+    # MAE,MSE,RMSE from utils call for test data 
+    print("\n\nDifferent Losses after inverting the prices to real scale for Test Data: \n")
+    metric_errors(y_test,y_pred,flag="Test")
 
-# Plotting the curve with predicted and real values for test data
-plot_acc(y_pred,y_test)
+    # Plotting the curve with predicted and real values for test data
+    plot_acc(y_pred,y_test)

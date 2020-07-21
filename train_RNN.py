@@ -165,21 +165,6 @@ def split(features,targets):
     test.to_csv(os.path.join("data/","test_data_RNN.csv"))
 
 
-"""
-//CALLS FOR CREATING TIME SERIES DATASET//
-Please uncomment if you want to re split and re create the data.
-"""
-
-# data_no_close=raw_data(os.path.join("data/","q2_dataset.csv"))          # Loading dataset from csv
-
-
-# win_size=3
-# features,targets=feature_gen(data_no_close,win_size)                    # Generating features
-
-
-# split(features,targets)                                                 # Preprocessing and saving preprocessed dataset 
-
-
 
 """
 Time series csv's created above
@@ -275,56 +260,69 @@ def LSTM_RNN(add_dense_32,add_dense_20,add_dense_10,opt,base=True):
         # plot_model(model, to_file='data/mlp_base.png', show_shapes=True, show_layer_names=True)
     return model 
     
- 
 
-"""
-Function calls..//
 
-Please uncomment the Required Architecture.. 
-"""
-   
-# Loading prerocessed data from utils call
-X_train,y_train=data_load(os.path.join("data/","train_data_RNN.csv"))
+if __name__ == "__main__": 
 
-# Normalizing the train dataset and reshaping.
-X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 
-# Training.. 
+    """
+    //CALLS FOR CREATING TIME SERIES DATASET//
+    Please uncomment if you want to re split and re create the data.
+    """
 
-model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=True)           #Architecture-1 
+    # data_no_close=raw_data(os.path.join("data/","q2_dataset.csv"))          # Loading dataset from csv
+
+
+    # win_size=3
+    # features,targets=feature_gen(data_no_close,win_size)                    # Generating features
+
+
+    # split(features,targets)                                                 # Preprocessing and saving preprocessed dataset
+
+
     
-# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=False)        #Architecture-2
-# model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='sgd',base=False)         #Architecture-3
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam',base=False)         #Architecture-4
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam',base=False)          #Architecture-5
+    # Loading prerocessed data from utils call
+    X_train,y_train=data_load(os.path.join("data/","train_data_RNN.csv"))
 
-# model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam',base=False)           #Architecture-6
+    # Normalizing the train dataset and reshaping.
+    X_train,y_train,X_train_scalar,y_train_scalar=normalize(X_train,y_train)
 
+    # Training.. 
+                    #Best model is uncommented..
+    model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=True)           #Architecture-1 
+        
+    # model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='adam',base=False)        #Architecture-2
+    # model=LSTM_RNN(add_dense_32=False,add_dense_20=False,add_dense_10=False,opt='sgd',base=False)         #Architecture-3
+    # model=LSTM_RNN(add_dense_32=True,add_dense_20=False,add_dense_10=False,opt='adam',base=False)         #Architecture-4
+    # model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=False,opt='adam',base=False)          #Architecture-5
 
-# history=model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)                             # on second model only   
-# history=model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=2)                              # on second model only   
-
-history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2) #Fitting the model
-
-model.save(os.path.join("models/","20831774_RNN_model.h5"))               #Saving the fitted model
-
-train_metrics_plot(history)                                               #Plotting the Training loss and MSE
-
-loss=model.evaluate(X_train,y_train)                                      #Evaluating the model on train data for overall loss.
-print("\n\nLoss and MAE on Train set: ",loss)
-
-y_pred_train= model.predict(X_train)                                      #To get the overall metric results while training
-
-# print("y_pred_train:",y_pred_train.shape) #np array (879,1)
-# print("y_train:", y_train.shape)          #np array (879,1)
+    # model=LSTM_RNN(add_dense_32=True,add_dense_20=True,add_dense_10=True,opt='adam',base=False)           #Architecture-6
 
 
-y_pred_train = y_train_scalar.inverse_transform(y_pred_train)    #Inverting both y_train and y_pred_train to get real values. 
-y_train = y_train_scalar.inverse_transform(y_train) 
+    # history=model.fit(X_train, y_train, epochs=100, batch_size=50, verbose=2)                             # on second model only   
+    # history=model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=2)                              # on second model only   
 
-print("\n\nRandom Testing for Training data \n\nPredicted: ",y_pred_train[0])
-print("Target: ",y_train[0])
+    history=model.fit(X_train, y_train, epochs=100, batch_size=10, verbose=2) #Fitting the model
 
-# MAE,MSE,RMSE from utils call for training data 
-print("\n\nDifferent Losses after inverting the prices to real scale for Train Data: \n")
-metric_errors(y_train,y_pred_train,flag="Train")
+    model.save(os.path.join("models/","20831774_RNN_model.h5"))               #Saving the fitted model
+
+    train_metrics_plot(history)                                               #Plotting the Training loss and MSE
+
+    loss=model.evaluate(X_train,y_train)                                      #Evaluating the model on train data for overall loss.
+    print("\n\nLoss and MAE on Train set: ",loss)
+
+    y_pred_train= model.predict(X_train)                                      #To get the overall metric results while training
+
+    # print("y_pred_train:",y_pred_train.shape) #np array (879,1)
+    # print("y_train:", y_train.shape)          #np array (879,1)
+
+
+    y_pred_train = y_train_scalar.inverse_transform(y_pred_train)    #Inverting both y_train and y_pred_train to get real values. 
+    y_train = y_train_scalar.inverse_transform(y_train) 
+
+    print("\n\nRandom Testing for Training data \n\nPredicted: ",y_pred_train[0])
+    print("Target: ",y_train[0])
+
+    # MAE,MSE,RMSE from utils call for training data 
+    print("\n\nDifferent Losses after inverting the prices to real scale for Train Data: \n")
+    metric_errors(y_train,y_pred_train,flag="Train")
